@@ -546,3 +546,24 @@ function importerAncienFormulaire() {
   props.setProperty('DERNIER_NUMERO', String(n));
   toast_(nb + ' commande(s) importée(s).');
 }
+
+/* ------------------------------------------------------------------ */
+/*  OUTIL : recaler la numérotation                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * À lancer après avoir supprimé des commandes (ex. commandes de test) :
+ * la prochaine commande reprendra juste après le plus grand numéro restant
+ * (CLAP-0001 si l'onglet Commandes est vide).
+ */
+function recalerNumerotation() {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ONGLET.COMMANDES);
+  var n = 0;
+  if (sh.getLastRow() > 1) {
+    n = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues()
+      .map(function (r) { return Number(String(r[0]).replace(/\D/g, '')) || 0; })
+      .reduce(function (a, b) { return Math.max(a, b); }, 0);
+  }
+  PropertiesService.getScriptProperties().setProperty('DERNIER_NUMERO', String(n));
+  toast_('Prochaine commande : CLAP-' + ('000' + (n + 1)).slice(-4));
+}

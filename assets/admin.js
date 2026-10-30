@@ -5,7 +5,7 @@
     get(k) { try { return sessionStorage.getItem('clap_' + k); } catch (e) { return null; } },
     set(k, v) { try { v == null ? sessionStorage.removeItem('clap_' + k) : sessionStorage.setItem('clap_' + k, v); } catch (e) {} }
   };
-  const STATUTS = ['À traiter', 'Commandée', 'Reçue', 'Remise', 'Annulée'];
+  const STATUTS = ['À traiter', 'Confirmée', 'En attente', 'Remise', 'Annulée'];
   const classeStatut = s => 's-' + String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]+/g, '-').replace(/-$/, '');
   const dateFr = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: '2-digit' }) + ' ' + x.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); };
 
@@ -75,7 +75,7 @@
     const parStatut = STATUTS.map(s => [s, D.commandes.filter(c => c.statut === s).length]);
     const max = Math.max(1, ...parStatut.map(x => x[1]));
     const aTraiter = D.commandes.filter(c => c.statut === 'À traiter').length;
-    const recues = D.commandes.filter(c => c.statut === 'Reçue').length;
+    const attente = D.commandes.filter(c => c.statut === 'En attente').length;
     const top = Object.entries(D.lignes.filter(l => statutDe(l.numero) !== 'Annulée').reduce((o, l) => (o[l.article] = (o[l.article] || 0) + l.qte, o), {})).sort((a, b) => b[1] - a[1]).slice(0, 6);
     $('#vue').innerHTML = `
       <div class="kpis">
@@ -91,8 +91,8 @@
         ${parStatut.map(([s, n]) => `<div class="barre-l"><span class="statut ${classeStatut(s)}">${s}</span><div class="piste"><div style="width:${n / max * 100}%"></div></div><b>${n}</b></div>`).join('')}
       </div></div>
       <div class="panneau"><h3>À faire</h3>
-        <p style="margin:0 0 6px">📋 <b>${aTraiter}</b> commande(s) à passer chez le fournisseur — <a href="#" data-aller="fournisseur">voir le récapitulatif</a></p>
-        <p style="margin:0">📦 <b>${recues}</b> commande(s) reçue(s) à remettre — <a href="#" data-aller="commandes" data-statut="Reçue">voir la liste</a></p>
+        <p style="margin:0 0 6px">📋 <b>${aTraiter}</b> commande(s) à traiter — <a href="#" data-aller="commandes" data-statut="À traiter">voir la liste</a> · <a href="#" data-aller="fournisseur">récap articles</a></p>
+        <p style="margin:0">⏳ <b>${attente}</b> commande(s) en attente — <a href="#" data-aller="commandes" data-statut="En attente">voir la liste</a></p>
       </div>
       <div class="panneau"><h3>Articles les plus commandés</h3>
         ${top.length ? `<table class="tab"><tbody>${top.map(([a, n]) => `<tr><td>${echap(a)}</td><td class="n">${n}</td></tr>`).join('')}</tbody></table>` : '<p class="note">Aucune commande pour le moment.</p>'}
@@ -214,7 +214,7 @@
 
   /* ---------- À commander (fournisseur) ---------- */
   function vueFournisseur() {
-    const modes = { 'À traiter': 'À commander au fournisseur', 'tout': 'Total (hors annulées)', 'Commandée': 'En attente de livraison' };
+    const modes = { 'À traiter': 'À traiter', 'Confirmée': 'Confirmées', 'En attente': 'En attente', 'tout': 'Total (hors annulées)' };
     const garde = l => { const s = statutDe(l.numero); return modeFournisseur === 'tout' ? s !== 'Annulée' : s === modeFournisseur; };
     const agg = {};
     D.lignes.filter(garde).forEach(l => {
@@ -226,6 +226,7 @@
     const arts = Object.keys(agg).sort((a, b) => ordreArt(a) - ordreArt(b));
     const totalPieces = arts.reduce((s, a) => s + Object.values(agg[a]).reduce((x, y) => x + y, 0), 0);
     const nums = [...new Set(D.lignes.filter(garde).map(l => l.numero))];
+    const suivant = { 'À traiter': 'Confirmée', 'Confirmée': 'En attente', 'En attente': 'Remise' }[modeFournisseur];
     $('#vue').innerHTML = `
       <div class="barre-outils">
         <div class="segment" style="background:#fff;border:1px solid var(--bord)">${Object.entries(modes).map(([k, v]) => `<button data-m="${k}" class="${modeFournisseur === k ? 'actif' : ''}">${v}</button>`).join('')}</div>
@@ -239,8 +240,7 @@
             const sous = t.reduce((s, x) => s + x[1], 0);
             return `<tr class="groupe"><td>${echap(a)}</td><td class="n">${sous}</td></tr>` + (t.length === 1 && t[0][0] === 'Unique' ? '' : t.map(([tl, q]) => `<tr><td style="padding-left:26px">${echap(tl)}</td><td class="n">${q}</td></tr>`).join(''));
           }).join('')}</tbody></table>` : '<p class="note">Rien pour le moment.</p>'}
-        ${modeFournisseur === 'À traiter' && nums.length ? `<div class="no-print" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn btn-orange" id="passer">Commande fournisseur passée → marquer ces ${nums.length} commande(s) « Commandée »</button></div>` : ''}
-        ${modeFournisseur === 'Commandée' && nums.length ? `<div class="no-print" style="margin-top:14px"><button class="btn btn-orange" id="recu">Livraison reçue → marquer ces ${nums.length} commande(s) « Reçue »</button></div>` : ''}
+        ${suivant && nums.length ? `<div class="no-print" style="margin-top:14px"><button class="btn btn-orange" id="passer">Passer ces ${nums.length} commande(s) en « ${suivant} »</button></div>` : ''}
       </div>`;
     $('#vue').querySelectorAll('[data-m]').forEach(b => b.onclick = () => { modeFournisseur = b.dataset.m; vueFournisseur(); });
     const lot = (nouveau) => async () => {
@@ -248,8 +248,7 @@
       try { await api('admin_maj_statut_lot', { numeros: nums, nouveau }); D.commandes.forEach(c => { if (nums.includes(c.numero)) c.statut = nouveau; }); toast(nums.length + ' commande(s) → ' + nouveau); vueFournisseur(); }
       catch (e) { toast(e.message, 'err'); }
     };
-    if ($('#passer')) $('#passer').onclick = lot('Commandée');
-    if ($('#recu')) $('#recu').onclick = lot('Reçue');
+    if ($('#passer')) $('#passer').onclick = lot(suivant);
   }
 
   /* ---------- Catalogue ---------- */

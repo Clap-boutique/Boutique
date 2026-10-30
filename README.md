@@ -48,8 +48,8 @@ Dans `Code.gs`, renseignez `ID_ANCIEN_SHEET` (l'identifiant du Sheet des répons
 | Étape | Où | Action |
 |---|---|---|
 | Un membre commande | Boutique | Il reçoit un e-mail avec son n° `CLAP-0001` ; la commande est **À traiter** |
-| Commande fournisseur | Admin → *À commander* | Récap par article et taille → bouton « marquer Commandée » |
-| Livraison reçue | Admin → *À commander → En attente de livraison* | Bouton « marquer Reçue » |
+| Validation | Admin → *Commandes* ou *À commander* | Passer en **Confirmée** (une par une ou en lot) |
+| Attente fournisseur / stock | Admin → *À commander → Confirmées* | Récap par article et taille → bouton « passer En attente » |
 | Remise au membre | Admin → *Commandes* | Fiche → statut **Remise**, interrupteur **Payée** |
 
 - **Catalogue** : ajouter/masquer un article, changer les prix, les tailles et la photo (un lien de partage Google Drive est accepté). Prix public vide = article réservé aux membres.

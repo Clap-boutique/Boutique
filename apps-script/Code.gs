@@ -19,7 +19,7 @@ var ONGLET = {
   PARAMS: 'Paramètres'
 };
 
-var STATUTS = ['À traiter', 'Commandée', 'Reçue', 'Remise', 'Annulée'];
+var STATUTS = ['À traiter', 'Confirmée', 'En attente', 'Remise', 'Annulée'];
 
 var COL_CATALOGUE = ['ID', 'Catégorie', 'Article', 'Description', 'Tailles', 'Prix membre', 'Prix public', 'Image', 'Actif', 'Ordre'];
 var COL_COMMANDES = ['N°', 'Date', 'Nom', 'Prénom', 'Téléphone', 'E-mail', 'Membre', 'Détail', 'Total (€)', 'Règlement', 'Payé', 'Statut', 'Préparée', 'Date de remise', 'Commentaire client', 'Notes internes'];
@@ -69,7 +69,7 @@ function setup() {
   cmd.getRange('H:H').setWrap(true);
   cmd.setColumnWidth(8, 320);
   var regle = SpreadsheetApp.newDataValidation().requireValueInList(STATUTS, true).build();
-  cmd.getRange('L2:L').setDataValidation(regle);
+  cmd.getRange('L2:L').clearDataValidations().setDataValidation(regle);
 
   var lig = creerOnglet_(ss, ONGLET.LIGNES, COL_LIGNES);
   lig.getRange('F:G').setNumberFormat('0.00 €');

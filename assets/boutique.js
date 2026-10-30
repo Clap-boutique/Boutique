@@ -266,9 +266,9 @@
   }
 
   /* ---------- Suivi ---------- */
-  const STATUTS = ['À traiter', 'Commandée', 'Reçue', 'Remise'];
+  const STATUTS = ['À traiter', 'Confirmée', 'En attente', 'Remise'];
   const classeStatut = s => 's-' + String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z]+/g, '-').replace(/-$/, '');
-  const LIBELLES = { 'À traiter': 'Commande reçue par le club', 'Commandée': 'Commandée chez le fournisseur', 'Reçue': 'Arrivée au club — prête à être remise', 'Remise': 'Remise — bonne route !', 'Annulée': 'Commande annulée' };
+  const LIBELLES = { 'À traiter': 'Commande reçue par le club', 'Confirmée': 'Commande confirmée par le club', 'En attente': 'En attente — vous serez prévenu dès que c\'est prêt', 'Remise': 'Remise — bonne route !', 'Annulée': 'Commande annulée' };
   $('#btnSuivi').onclick = () => {
     const d = store.lire('commandes', [])[0];
     if (d && !$('#sNum').value) { $('#sNum').value = d.numero; $('#sMail').value = d.email; }

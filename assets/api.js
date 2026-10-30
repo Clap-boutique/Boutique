@@ -53,7 +53,7 @@
     ],
     commandes: [], lignes: [], n: 0
   };
-  const statuts = ['À traiter', 'Commandée', 'Reçue', 'Remise', 'Annulée'];
+  const statuts = ['À traiter', 'Confirmée', 'En attente', 'Remise', 'Annulée'];
   function cmd(nom, prenom, membre, panier, statut, paye, regl) {
     const lignes = panier.map(([id, taille, qte]) => { const pr = etat.produits.find(x => x.id === id); return { article: pr.article, taille, qte, pu: membre ? (pr.prixMembre ?? pr.prixPublic) : pr.prixPublic }; });
     const numero = 'CLAP-' + String(++etat.n).padStart(4, '0');
@@ -63,8 +63,8 @@
     return { numero, total };
   }
   cmd('MARTIN', 'Sophie', true, [['doudoune-am', 'M (F)', 1], ['casquette', 'Unique', 2]], 'À traiter', false, 'Carte bleue');
-  cmd('DURAND', 'Paul', true, [['softshell', 'L', 1]], 'Commandée', true, 'Virement');
-  cmd('LEROY', 'Marc', false, [['polo-mc', 'XL (H)', 2], ['ecusson', 'Unique', 1]], 'Reçue', true, 'Chèque');
+  cmd('DURAND', 'Paul', true, [['softshell', 'L', 1]], 'Confirmée', true, 'Virement');
+  cmd('LEROY', 'Marc', false, [['polo-mc', 'XL (H)', 2], ['ecusson', 'Unique', 1]], 'En attente', true, 'Chèque');
   cmd('PETIT', 'Julie', true, [['tshirt-mc', 'S', 3]], 'À traiter', false, 'Espèces');
 
   const attendre = (ms = 350) => new Promise(r => setTimeout(r, ms));

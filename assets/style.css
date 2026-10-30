@@ -134,8 +134,8 @@ a { color: var(--orange-fonce); }
 .modale-boite h2 { margin: 0 0 12px; font-family: var(--titre); text-transform: uppercase; }
 .statut { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
 .s-a-traiter { background: #fff1d6; color: #8a5a00; }
-.s-commandee { background: #e3e9ff; color: #2f47a8; }
-.s-recue { background: #e2f3ff; color: #0f6a96; }
+.s-confirmee { background: #e3e9ff; color: #2f47a8; }
+.s-en-attente { background: #e2f3ff; color: #0f6a96; }
 .s-remise { background: #e3f5ea; color: #1f7a48; }
 .s-annulee { background: #f1f1f3; color: #7a7d88; text-decoration: line-through; }
 .etapes { display: flex; gap: 4px; margin: 14px 0; }

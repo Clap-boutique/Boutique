@@ -94,11 +94,11 @@
         <h3 class="produit-nom">${echap(p.article)}</h3>
         ${p.description ? `<p class="produit-desc">${echap(p.description)}</p>` : ''}
         ${prixHtml}
-        <div class="tailles">${tailles}</div>
+        ${prix == null ? '' : `<div class="tailles">${tailles}</div>
         <div class="ajout">
           <div class="qte"><button type="button" data-q="-1" aria-label="Moins">−</button><span>${c.qte}</span><button type="button" data-q="1" aria-label="Plus">+</button></div>
-          <button type="button" class="btn btn-orange btn-plein" data-ajout ${prix == null ? 'disabled' : ''}>Ajouter</button>
-        </div>
+          <button type="button" class="btn btn-orange btn-plein" data-ajout>Ajouter</button>
+        </div>`}
       </div>
     </article>`;
   }
@@ -106,6 +106,7 @@
   function brancherCarte(el) {
     const p = produit(el.dataset.id);
     const c = choix[p.id];
+    if (!el.querySelector('[data-ajout]')) return;
     el.querySelectorAll('.taille').forEach(b => b.onclick = () => {
       c.taille = b.dataset.t;
       el.querySelectorAll('.taille').forEach(x => x.classList.toggle('choisie', x === b));

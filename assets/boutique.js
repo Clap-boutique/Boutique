@@ -94,7 +94,8 @@
         <h3 class="produit-nom">${echap(p.article)}</h3>
         ${p.description ? `<p class="produit-desc">${echap(p.description)}</p>` : ''}
         ${prixHtml}
-        ${prix == null ? '' : `<div class="tailles">${tailles}</div>
+        ${prix == null ? '' : `<button type="button" class="btn btn-orange btn-choisir" data-choisir>${p.tailles.length === 1 ? 'Ajouter' : 'Choisir'}</button>
+        <div class="tailles">${tailles}</div>
         <div class="ajout">
           <div class="qte"><button type="button" data-q="-1" aria-label="Moins">−</button><span>${c.qte}</span><button type="button" data-q="1" aria-label="Plus">+</button></div>
           <button type="button" class="btn btn-orange btn-plein" data-ajout>Ajouter</button>
@@ -107,6 +108,9 @@
     const p = produit(el.dataset.id);
     const c = choix[p.id];
     if (!el.querySelector('[data-ajout]')) return;
+    const surMobile = () => window.matchMedia('(max-width: 720px)').matches;
+    el.querySelector('[data-choisir]').onclick = e => { e.stopPropagation(); ouvrirFeuille(p.id); };
+    el.addEventListener('click', e => { if (surMobile() && !e.target.closest('button')) ouvrirFeuille(p.id); });
     el.querySelectorAll('.taille').forEach(b => b.onclick = () => {
       c.taille = b.dataset.t;
       el.querySelectorAll('.taille').forEach(x => x.classList.toggle('choisie', x === b));
@@ -116,18 +120,54 @@
       el.querySelector('.qte span').textContent = c.qte;
     });
     el.querySelector('[data-ajout]').onclick = () => {
-      if (!c.taille) { toast('Choisissez une taille', 'err'); el.querySelector('.tailles').animate([{ transform: 'translateX(-4px)' }, { transform: 'translateX(4px)' }, { transform: 'none' }], 200); return; }
-      const ex = panier.find(l => l.id === p.id && l.taille === c.taille);
-      const max = data.quantiteMax || 5;
-      if (ex) {
-        if (ex.qte + c.qte > max) toast(`Maximum ${max} par taille — au-delà, précisez-le en commentaire`, 'err');
-        ex.qte = Math.min(max, ex.qte + c.qte);
-      } else panier.push({ id: p.id, taille: c.taille, qte: c.qte });
-      sauverPanier();
-      toast(`${p.article}${c.taille !== 'Unique' ? ' (' + c.taille + ')' : ''} ajouté au panier`);
-      c.qte = 1; el.querySelector('.qte span').textContent = 1;
+      if (ajouter(p, c, el.querySelector('.tailles'))) el.querySelector('.qte span').textContent = 1;
     };
   }
+
+  function ajouter(p, c, zoneTailles) {
+    if (!c.taille) {
+      toast('Choisissez une taille', 'err');
+      zoneTailles && zoneTailles.animate([{ transform: 'translateX(-5px)' }, { transform: 'translateX(5px)' }, { transform: 'none' }], 220);
+      return false;
+    }
+    const ex = panier.find(l => l.id === p.id && l.taille === c.taille);
+    const max = data.quantiteMax || 5;
+    if (ex) {
+      if (ex.qte + c.qte > max) toast(`Maximum ${max} par taille — au-delà, précisez-le en commentaire`, 'err');
+      ex.qte = Math.min(max, ex.qte + c.qte);
+    } else panier.push({ id: p.id, taille: c.taille, qte: c.qte });
+    sauverPanier();
+    toast(`✓ ${p.article}${c.taille !== 'Unique' ? ' (' + c.taille + ')' : ''} ajouté`);
+    c.qte = 1;
+    return true;
+  }
+
+  /* ---------- Fiche article (volet mobile) ---------- */
+  function ouvrirFeuille(id) {
+    const p = produit(id), c = choix[id], prix = prixDe(p);
+    if (prix == null) return;
+    const unique = p.tailles.length === 1 && p.tailles[0] === 'Unique';
+    if (p.tailles.length === 1) c.taille = p.tailles[0];
+    const f = $('#feuille');
+    f.querySelector('.feuille-corps').innerHTML = `
+      <div class="feuille-visuel">${p.image ? `<img class="photo" src="${echap(imageUrl(p.image))}" alt="">` : '<img class="filigrane" src="assets/logo.png" alt="">'}</div>
+      <h3 class="produit-nom">${echap(p.article)}</h3>
+      ${p.description ? `<p class="produit-desc">${echap(p.description)}</p>` : ''}
+      <div class="prix"><strong>${euros(prix)}</strong>${membre && p.prixPublic != null && p.prixMembre != null && p.prixMembre < p.prixPublic ? `<span class="barre">${euros(p.prixPublic)}</span><span class="info">tarif membre</span>` : (!membre && p.prixMembre != null && p.prixMembre < prix ? `<span class="info">${euros(p.prixMembre)} pour les membres</span>` : '')}</div>
+      ${unique ? '<p class="note">Taille unique</p>' : `<div class="feuille-label">Taille</div><div class="tailles tailles-grandes">${p.tailles.map(t => `<button type="button" class="taille ${c.taille === t ? 'choisie' : ''}" data-t="${echap(t)}">${echap(t)}</button>`).join('')}</div>`}
+      <div class="feuille-label">Quantité</div>
+      <div class="qte qte-grande"><button type="button" data-q="-1" aria-label="Moins">−</button><span>${c.qte}</span><button type="button" data-q="1" aria-label="Plus">+</button></div>`;
+    const maj = () => { f.querySelector('.feuille-pied .btn').textContent = 'Ajouter · ' + euros(prix * c.qte); };
+    f.querySelectorAll('.feuille-corps .taille').forEach(b => b.onclick = () => { c.taille = b.dataset.t; f.querySelectorAll('.feuille-corps .taille').forEach(x => x.classList.toggle('choisie', x === b)); });
+    f.querySelectorAll('.feuille-corps [data-q]').forEach(b => b.onclick = () => { c.qte = Math.min(data.quantiteMax || 5, Math.max(1, c.qte + Number(b.dataset.q))); f.querySelector('.qte-grande span').textContent = c.qte; maj(); });
+    f.querySelector('.feuille-pied .btn').onclick = () => { if (ajouter(p, c, f.querySelector('.tailles-grandes'))) { fermerFeuille(); rendreCatalogue(); } };
+    maj();
+    f.classList.add('ouvert'); $('#voileFeuille').classList.add('ouvert');
+    document.body.classList.add('fige');
+  }
+  function fermerFeuille() { $('#feuille').classList.remove('ouvert'); $('#voileFeuille').classList.remove('ouvert'); document.body.classList.remove('fige'); }
+  $('#voileFeuille').onclick = fermerFeuille;
+  $('#fermerFeuille').onclick = fermerFeuille;
 
   /* ---------- Panier ---------- */
   function sauverPanier() { store.ecrire('panier', panier); majPanier(); }
@@ -140,11 +180,11 @@
     if ($('#tiroir').classList.contains('ouvert') && etape !== 'ok') rendreTiroir();
   }
 
-  function ouvrir() { etape = 'panier'; $('#tiroir').classList.add('ouvert'); $('#voile').classList.add('ouvert'); rendreTiroir(); majPanier(); }
-  function fermer() { $('#tiroir').classList.remove('ouvert'); $('#voile').classList.remove('ouvert'); if (etape === 'ok') etape = 'panier'; majPanier(); }
+  function ouvrir() { document.body.classList.add('fige'); etape = 'panier'; $('#tiroir').classList.add('ouvert'); $('#voile').classList.add('ouvert'); rendreTiroir(); majPanier(); }
+  function fermer() { document.body.classList.remove('fige'); $('#tiroir').classList.remove('ouvert'); $('#voile').classList.remove('ouvert'); if (etape === 'ok') etape = 'panier'; majPanier(); }
   $('#btnPanier').onclick = ouvrir; $('#btnPanierMobile').onclick = ouvrir;
   $('#fermerTiroir').onclick = fermer; $('#voile').onclick = fermer;
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { fermer(); $('#modaleSuivi').classList.add('cache'); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { fermer(); fermerFeuille(); $('#modaleSuivi').classList.add('cache'); } });
 
   function rendreTiroir() {
     const corps = $('#tiroirCorps'), pied = $('#tiroirPied');

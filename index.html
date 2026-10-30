@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>La boutique du CLAP</title>
+  <meta name="description" content="Boutique officielle du Club Légende Auto Passion — vêtements et accessoires du club.">
+  <meta name="theme-color" content="#4f5566">
+  <meta property="og:title" content="La boutique du CLAP">
+  <meta property="og:description" content="Vêtements et accessoires du Club Légende Auto Passion.">
+  <meta property="og:image" content="assets/logo.png">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div id="demo" class="banniere-demo cache">Mode démonstration — les commandes ne sont pas enregistrées.</div>
+
+  <header class="entete">
+    <div class="conteneur entete-barre">
+      <img class="entete-logo" src="assets/logo.png" alt="Logo CLAP">
+      <div class="entete-titre">La boutique du CLAP<small>Club Légende Auto Passion</small></div>
+      <div class="entete-actions">
+        <button class="btn-entete" id="btnSuivi" type="button" title="Suivre ma commande">📦 <span class="txt">Suivre ma commande</span></button>
+        <button class="btn-entete" id="btnPanier" type="button" title="Panier">🛒 <span class="txt">Panier</span> <span class="pastille" id="nbPanier">0</span></button>
+      </div>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="conteneur">
+      <h1>Portez les couleurs <span>du club</span></h1>
+      <p id="accueil"></p>
+    </div>
+  </section>
+
+  <div class="outils">
+    <div class="conteneur outils-in">
+      <div class="membre">
+        <span>Membre du CLAP ?</span>
+        <div class="segment" role="group" aria-label="Statut membre">
+          <button type="button" data-membre="1" class="actif">Oui</button>
+          <button type="button" data-membre="0">Non</button>
+        </div>
+      </div>
+      <nav class="filtres" id="filtres"></nav>
+    </div>
+  </div>
+
+  <main class="conteneur" id="catalogue">
+    <div class="chargement"><div class="roue"></div></div>
+  </main>
+
+  <footer class="pied">
+    <div class="conteneur pied-in">
+      <span>© <span id="annee"></span> CLAP — Club Légende Auto Passion</span>
+      <span><a id="lienFb" href="#" target="_blank" rel="noopener">Groupe Facebook du club</a> · <a href="admin.html">Espace admin</a></span>
+    </div>
+  </footer>
+
+  <div class="barre-panier" id="barrePanier">
+    <button class="btn btn-orange" type="button" id="btnPanierMobile"><span>🛒 Voir mon panier</span><span id="totalMobile"></span></button>
+  </div>
+
+  <!-- Panier / commande -->
+  <div class="voile" id="voile"></div>
+  <aside class="tiroir" id="tiroir" aria-label="Panier">
+    <div class="tiroir-tete">
+      <h2 id="tiroirTitre">Mon panier</h2>
+      <button class="fermer" type="button" id="fermerTiroir" aria-label="Fermer">×</button>
+    </div>
+    <div class="tiroir-corps" id="tiroirCorps"></div>
+    <div class="tiroir-pied" id="tiroirPied"></div>
+  </aside>
+
+  <!-- Suivi -->
+  <div class="modale cache" id="modaleSuivi">
+    <div class="modale-boite">
+      <h2>Suivre ma commande</h2>
+      <form id="formSuivi">
+        <div class="champ"><label for="sNum">N° de commande</label><input id="sNum" required placeholder="CLAP-0012"></div>
+        <div class="champ"><label for="sMail">E-mail utilisé pour la commande</label><input id="sMail" type="email" required></div>
+        <div id="resSuivi"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button type="button" class="btn btn-gris" data-fermer>Fermer</button>
+          <button class="btn btn-orange">Rechercher</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/boutique.js"></script>
+</body>
+</html>

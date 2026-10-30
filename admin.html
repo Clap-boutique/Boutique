@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Admin — Boutique du CLAP</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#383d4b">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Saira+Condensed:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/admin.css">
+</head>
+<body class="admin">
+  <div id="demo" class="banniere-demo cache">Mode démonstration — mot de passe : <b>demo</b></div>
+
+  <!-- Connexion -->
+  <section id="ecranLogin" class="login">
+    <form class="login-boite" id="formLogin">
+      <img src="assets/logo.png" alt="CLAP" class="login-logo">
+      <h1>Espace admin</h1>
+      <p class="note">La boutique du CLAP</p>
+      <div class="champ"><label for="mdp">Mot de passe</label><input id="mdp" type="password" required autocomplete="current-password"></div>
+      <div id="errLogin"></div>
+      <button class="btn btn-orange" style="width:100%">Se connecter</button>
+      <p class="note" style="margin-top:16px"><a href="./">← Retour à la boutique</a></p>
+    </form>
+  </section>
+
+  <!-- Application -->
+  <section id="ecranApp" class="cache">
+    <header class="entete">
+      <div class="conteneur entete-barre">
+        <img class="entete-logo" src="assets/logo.png" alt="">
+        <div class="entete-titre">Admin boutique<small>Club Légende Auto Passion</small></div>
+        <div class="entete-actions">
+          <button class="btn-entete" id="btnRafraichir" title="Actualiser">⟳ <span class="txt">Actualiser</span></button>
+          <a class="btn-entete" href="./" target="_blank" title="Voir la boutique">↗ <span class="txt">Boutique</span></a>
+          <button class="btn-entete" id="btnDeco" title="Déconnexion">⏻</button>
+        </div>
+      </div>
+    </header>
+    <nav class="onglets"><div class="conteneur onglets-in" id="onglets">
+      <button data-v="bord" class="actif">Tableau de bord</button>
+      <button data-v="commandes">Commandes</button>
+      <button data-v="fournisseur">À commander</button>
+      <button data-v="catalogue">Catalogue</button>
+      <button data-v="params">Paramètres</button>
+    </div></nav>
+    <main class="conteneur" id="vue"><div class="chargement"><div class="roue"></div></div></main>
+    <footer class="pied"><div class="conteneur pied-in"><span>© <span id="annee"></span> CLAP — Club Légende Auto Passion</span></div></footer>
+  </section>
+
+  <div class="voile" id="voile"></div>
+  <aside class="tiroir" id="tiroir">
+    <div class="tiroir-tete"><h2 id="tiroirTitre"></h2><button class="fermer" id="fermerTiroir" aria-label="Fermer">×</button></div>
+    <div class="tiroir-corps" id="tiroirCorps"></div>
+  </aside>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/api.js"></script>
+  <script src="assets/admin.js"></script>
+</body>
+</html>
